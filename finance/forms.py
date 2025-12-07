@@ -1,6 +1,7 @@
+from datetime import date
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, EqualTo
+from wtforms import StringField, PasswordField, SubmitField, SelectField, IntegerField, DateTimeLocalField
+from wtforms.validators import DataRequired, EqualTo, NumberRange
 
 
 class LoginForm(FlaskForm):
@@ -17,3 +18,14 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm password', validators=[DataRequired(), EqualTo('password',
                                                                                                  message='Passwords must match')])
     submit = SubmitField('Register')
+
+
+class IncomeForm(FlaskForm):
+    year_month = StringField('Year_month', validators=[DataRequired(message='Select year and month')])
+    main_income = IntegerField('Main income', validators=[DataRequired(message='Specify your main income'),
+            NumberRange(min=0, message='Income cannot be negative')], default=0)
+    additional_income = IntegerField('Additional income', validators=[
+            DataRequired(message='Please indicate additional income'),
+            NumberRange(min=0, message='Income cannot be negative')], default=0)
+    submit = SubmitField('Save')
+

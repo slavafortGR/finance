@@ -1,10 +1,13 @@
 import functools
+from datetime import date
 
 from flask import render_template, redirect, request,url_for, flash, session
+from sqlalchemy.sql.functions import current_user
+
 from finance import app, db
-from finance.forms import LoginForm, RegistrationForm
+from finance.forms import LoginForm, RegistrationForm, IncomeForm
 from finance.logger import logger
-from finance.models import User
+from finance.models import User, Income
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -117,3 +120,45 @@ def return_profile():
     else:
         flash('You need to log in', 'danger')
         return redirect(url_for('login_user_get'))
+
+
+@app.route('/income', methods=['GET'])
+@log_exceptions
+def add_income_get():
+    income_form = IncomeForm(request.form)
+
+    if 'user_id' in session:
+        return render_template('add_income.html', income_form=income_form)
+    flash('You need login', 'danger')
+    return redirect(url_for('login_user_get'))
+
+
+# @app.route('/income', methods=['POST'])
+# @log_exceptions
+# def add_income_post():
+#     income_form = IncomeForm(request.form)
+#
+#     if income_form.validate_on_submit():
+#         existing_income = Income.query.filter_by(
+#             user_id=current_user.id,
+#             year=income_form.year.data,
+#             month=income_form.month.data
+#         ).first()
+#
+#         if existing_income:
+#             flash(f'Income for {income_form.month.data}.{income_form.year.data} already exists. Use edit', 'warning')
+#             return redirect(url_for('edit_income_get', income_id=existing_income.id))
+#
+#         income = Income(
+#             user_id=current_user.id,
+#             year=income_form.year.data,
+#             month=income_form.month.data,
+#             main_income=income_form.main_income.data,
+#             additional_income=income_form.additional_income.data
+#         )
+#
+#         db.session.add(income)
+#         db.session.commit()
+#
+#         flash('Income successfully added', 'success')
+#         return redirect(url_for('profile.html'))

@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <h2>Add income</h2>
+
+    <form action="/income" method="POST">
+        <div class="mb-3">
+            {{ income_form.hidden_tag() }}
+            <label class="form-label"><strong>Date and time:</strong></label>
+            {{ income_form.year_month(class="form-control", required=True, type="month") }}
+            {% for error in income_form.year_month.errors %}
+                    <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            <label class="form-label"><strong>Main income:</strong></label>
+            {{ income_form.main_income(class="form-control", required=True, placeholder="0") }} DKK
+            {% for error in income_form.main_income.errors %}
+                    <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            <label class="form-label"><strong>Additional income:</strong></label>
+            {{ income_form.additional_income(class="form-control", required=True, placeholder="0") }} DKK
+            {% for error in income_form.additional_income.errors %}
+                    <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+    </form>
+</div>
+
+<input type="submit" class="btn btn-success" value="Save">
+{% endblock %}
