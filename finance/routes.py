@@ -133,32 +133,47 @@ def add_income_get():
     return redirect(url_for('login_user_get'))
 
 
-# @app.route('/income', methods=['POST'])
-# @log_exceptions
-# def add_income_post():
-#     income_form = IncomeForm(request.form)
-#
-#     if income_form.validate_on_submit():
-#         existing_income = Income.query.filter_by(
-#             user_id=current_user.id,
-#             year=income_form.year.data,
-#             month=income_form.month.data
-#         ).first()
-#
-#         if existing_income:
-#             flash(f'Income for {income_form.month.data}.{income_form.year.data} already exists. Use edit', 'warning')
-#             return redirect(url_for('edit_income_get', income_id=existing_income.id))
-#
-#         income = Income(
-#             user_id=current_user.id,
-#             year=income_form.year.data,
-#             month=income_form.month.data,
-#             main_income=income_form.main_income.data,
-#             additional_income=income_form.additional_income.data
-#         )
-#
-#         db.session.add(income)
-#         db.session.commit()
-#
-#         flash('Income successfully added', 'success')
-#         return redirect(url_for('profile.html'))
+@app.route('/income', methods=['POST'])
+@log_exceptions
+def add_income_post():
+
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    income_form = IncomeForm(request.form)
+
+    if income_form.validate_on_submit():
+        date_str = income_form.date.data
+
+        try:
+            year, month, day = date_str.split('-')
+            year = int(year)
+            month = int(month)
+            day = int(day)
+        except (ValueError, AttributeError):
+            flash('Invalid date format', 'danger')
+            return render_template('add_income.html', income_form=income_form)
+
+        new_income = Income(
+            user_id=session['user_id'],
+            year=year,
+            month=month,
+            day=day,
+            main_income=income_form.main_income.data,
+            additional_income=income_form.additional_income.data
+        )
+
+        try:
+            db.session.add(new_income)
+            db.session.commit()
+
+            flash('Income successfully added', 'success')
+            return redirect(url_for('return_profile'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+            return render_template('add_income.html', income_form=income_form)
+    else:
+        flash('Incorrect income data', 'danger')
+        return render_template('add_income.html', income_form=income_form)

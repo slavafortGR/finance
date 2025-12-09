@@ -8,8 +8,8 @@
         <div class="mb-3">
             {{ income_form.hidden_tag() }}
             <label class="form-label"><strong>Date and time:</strong></label>
-            {{ income_form.year_month(class="form-control", required=True, type="month") }}
-            {% for error in income_form.year_month.errors %}
+            {{ income_form.date(class="form-control", required=True, type="date") }}
+            {% for error in income_form.date.errors %}
                     <span class="text-danger">{{ error }}</span>
             {% endfor %}
         </div>
@@ -27,8 +27,8 @@
                     <span class="text-danger">{{ error }}</span>
             {% endfor %}
         </div>
+        <input type="submit" class="btn btn-success" value="Save">
     </form>
 </div>
 
-<input type="submit" class="btn btn-success" value="Save">
 {% endblock %}

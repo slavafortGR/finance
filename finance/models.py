@@ -31,14 +31,11 @@ class Income(db.Model):
     year = db.Column(db.Integer, nullable=False, index=True)
     month = db.Column(db.Integer, nullable=False, index=True)
     main_income = db.Column(db.Integer, default=0)
+    day = db.Column(db.Integer, nullable=False)
     additional_income = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
-
-    __table_args__ = (
-        db.UniqueConstraint('user_id', 'year', 'month', name='unique_user_income_month'),
-    )
 
     @property
     def total(self):

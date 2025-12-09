@@ -21,11 +21,10 @@ class RegistrationForm(FlaskForm):
 
 
 class IncomeForm(FlaskForm):
-    year_month = StringField('Year_month', validators=[DataRequired(message='Select year and month')])
+    date = StringField('Date', validators=[DataRequired(message='Select date')])
     main_income = IntegerField('Main income', validators=[DataRequired(message='Specify your main income'),
             NumberRange(min=0, message='Income cannot be negative')], default=0)
     additional_income = IntegerField('Additional income', validators=[
             DataRequired(message='Please indicate additional income'),
             NumberRange(min=0, message='Income cannot be negative')], default=0)
     submit = SubmitField('Save')
-
