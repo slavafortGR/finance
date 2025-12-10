@@ -114,9 +114,38 @@ def logout():
 @log_exceptions
 def return_profile():
     user_id = session.get('user_id')
+
     if user_id:
         user = User.query.filter_by(id=user_id).first()
-        return render_template('profile.html', user=user)
+
+        current_date = date.today()
+        current_year = current_date.year
+        current_month = current_date.month
+
+        incomes = Income.query.filter_by(user_id=user_id).filter(
+            Income.year == current_year,
+            Income.month == current_month
+        ).all()
+
+        total_main_income = sum(income.main_income for income in incomes)
+        total_additional_income = sum(income.additional_income for income in incomes)
+        total_income = total_main_income + total_additional_income
+
+        all_incomes = Income.query.filter_by(user_id=user_id).order_by(
+            Income.year.desc(),
+            Income.month.desc(),
+            Income.day.desc()
+        ).all()
+
+        return render_template('profile.html',
+                               user=user,
+                               total_main_income=total_main_income,
+                               total_additional_income=total_additional_income,
+                               total_income=total_income,
+                               incomes=incomes,
+                               all_incomes=all_incomes,
+                               current_year=current_year,
+                               current_month=current_month)
     else:
         flash('You need to log in', 'danger')
         return redirect(url_for('login_user_get'))
