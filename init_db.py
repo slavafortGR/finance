@@ -13,37 +13,37 @@ def init_database():
 def add_default_categories():
 
     categories = [
-        {'name': 'housing', 'display_name': 'Жильё', 'icon': '🏠', 'order': 1},
-        {'name': 'utilities', 'display_name': 'Коммунальные услуги', 'icon': '💡', 'order': 2},
-        {'name': 'groceries', 'display_name': 'Продукты', 'icon': '🛒', 'order': 3},
-        {'name': 'transport', 'display_name': 'Транспорт', 'icon': '🚗', 'order': 4},
-        {'name': 'health', 'display_name': 'Здоровье', 'icon': '⚕️', 'order': 5},
-        {'name': 'insurance', 'display_name': 'Страхование', 'icon': '🛡️', 'order': 6},
+        {'name': 'housing', 'display_name': 'Housing', 'icon': '🏠', 'order': 1},
+        {'name': 'utilities', 'display_name': 'Utilities', 'icon': '💡', 'order': 2},
+        {'name': 'groceries', 'display_name': 'Groceries', 'icon': '🛒', 'order': 3},
+        {'name': 'transport', 'display_name': 'Transport', 'icon': '🚗', 'order': 4},
+        {'name': 'health', 'display_name': 'Health', 'icon': '⚕️', 'order': 5},
+        {'name': 'insurance', 'display_name': 'Insurance', 'icon': '🛡️', 'order': 6},
 
-        {'name': 'restaurants', 'display_name': 'Рестораны и кафе', 'icon': '🍽️', 'order': 7},
-        {'name': 'shopping', 'display_name': 'Покупки', 'icon': '🛍️', 'order': 8},
-        {'name': 'entertainment', 'display_name': 'Развлечения', 'icon': '🎬', 'order': 9},
-        {'name': 'sports', 'display_name': 'Спорт и фитнес', 'icon': '⚽', 'order': 10},
-        {'name': 'beauty', 'display_name': 'Красота', 'icon': '💅', 'order': 11},
+        {'name': 'restaurants', 'display_name': 'Restaurants', 'icon': '🍽️', 'order': 7},
+        {'name': 'shopping', 'display_name': 'Shopping', 'icon': '🛍️', 'order': 8},
+        {'name': 'entertainment', 'display_name': 'Entertainment', 'icon': '🎬', 'order': 9},
+        {'name': 'sports', 'display_name': 'Sports & Fitness', 'icon': '⚽', 'order': 10},
+        {'name': 'beauty', 'display_name': 'Beauty', 'icon': '💅', 'order': 11},
 
-        {'name': 'phone', 'display_name': 'Связь', 'icon': '📱', 'order': 12},
-        {'name': 'internet', 'display_name': 'Интернет', 'icon': '🌐', 'order': 13},
-        {'name': 'subscriptions', 'display_name': 'Подписки', 'icon': '📺', 'order': 14},
+        {'name': 'phone', 'display_name': 'Phone', 'icon': '📱', 'order': 12},
+        {'name': 'internet', 'display_name': 'Internet', 'icon': '🌐', 'order': 13},
+        {'name': 'subscriptions', 'display_name': 'Subscriptions', 'icon': '📺', 'order': 14},
 
-        {'name': 'education', 'display_name': 'Образование', 'icon': '📚', 'order': 15},
-        {'name': 'books', 'display_name': 'Книги', 'icon': '📖', 'order': 16},
+        {'name': 'education', 'display_name': 'Education', 'icon': '📚', 'order': 15},
+        {'name': 'books', 'display_name': 'Books', 'icon': '📖', 'order': 16},
 
-        {'name': 'travel', 'display_name': 'Путешествия', 'icon': '✈️', 'order': 17},
-        {'name': 'vacation', 'display_name': 'Отпуск', 'icon': '🏖️', 'order': 18},
+        {'name': 'travel', 'display_name': 'Travel', 'icon': '✈️', 'order': 17},
+        {'name': 'vacation', 'display_name': 'Vacation', 'icon': '🏖️', 'order': 18},
 
-        {'name': 'savings', 'display_name': 'Сбережения', 'icon': '💰', 'order': 19},
-        {'name': 'investments', 'display_name': 'Инвестиции', 'icon': '📈', 'order': 20},
-        {'name': 'debt', 'display_name': 'Долги и кредиты', 'icon': '💳', 'order': 21},
+        {'name': 'savings', 'display_name': 'Savings', 'icon': '💰', 'order': 19},
+        {'name': 'investments', 'display_name': 'Investments', 'icon': '📈', 'order': 20},
+        {'name': 'debt', 'display_name': 'Debt & Credits', 'icon': '💳', 'order': 21},
 
-        {'name': 'gifts', 'display_name': 'Подарки', 'icon': '🎁', 'order': 22},
-        {'name': 'pets', 'display_name': 'Питомцы', 'icon': '🐾', 'order': 23},
-        {'name': 'charity', 'display_name': 'Благотворительность', 'icon': '❤️', 'order': 24},
-        {'name': 'other', 'display_name': 'Прочее', 'icon': '📝', 'order': 25},
+        {'name': 'gifts', 'display_name': 'Gifts', 'icon': '🎁', 'order': 22},
+        {'name': 'pets', 'display_name': 'Pets', 'icon': '🐾', 'order': 23},
+        {'name': 'charity', 'display_name': 'Charity', 'icon': '❤️', 'order': 24},
+        {'name': 'other', 'display_name': 'Other', 'icon': '📝', 'order': 25},
     ]
 
     with app.app_context():
