@@ -70,7 +70,6 @@ class Category(db.Model):
     icon = db.Column(db.String(10), nullable=False)
     order = db.Column(db.Integer, default=0)
 
-    # Связь
     expenses = db.relationship('Expense', backref='category', lazy='dynamic')
 
     def __repr__(self):

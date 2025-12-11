@@ -1,13 +1,14 @@
 import functools
-from datetime import date
+from datetime import datetime, date
+from itertools import groupby
 
 from flask import render_template, redirect, request,url_for, flash, session
 from sqlalchemy.sql.functions import current_user
 
 from finance import app, db
-from finance.forms import LoginForm, RegistrationForm, IncomeForm
+from finance.forms import LoginForm, RegistrationForm, IncomeForm, ExpenseForm
 from finance.logger import logger
-from finance.models import User, Income
+from finance.models import User, Income, Expense
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -206,3 +207,154 @@ def add_income_post():
     else:
         flash('Incorrect income data', 'danger')
         return render_template('add_income.html', income_form=income_form)
+
+
+@app.route('/expense', methods=['GET'])
+@log_exceptions
+def add_expense_get():
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    expense_form = ExpenseForm()
+    return render_template('add_expense.html', expense_form=expense_form)
+
+
+@app.route('/expense', methods=['POST'])
+@log_exceptions
+def add_expense_post():
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    expense_form = ExpenseForm(request.form)
+
+    if expense_form.validate_on_submit():
+        try:
+            expense_date = datetime.strptime(expense_form.date.data, '%Y-%m-%d').date()
+        except ValueError:
+            flash('Invalid date format', 'danger')
+            return render_template('add_expense.html', expense_form=expense_form)
+
+        new_expense = Expense(
+            user_id=session['user_id'],
+            category_id=expense_form.category_id.data,
+            amount=expense_form.amount.data,
+            date=expense_date,
+            comment=expense_form.comment.data.strip() or None
+        )
+
+        try:
+            db.session.add(new_expense)
+            db.session.commit()
+            flash('Expense successfully added', 'success')
+            return redirect(url_for('list_expenses'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+            return render_template('add_expense.html', expense_form=expense_form)
+    else:
+        flash('Incorrect expense data', 'danger')
+        return render_template('add_expense.html', expense_form=expense_form)
+
+
+@app.route('/expenses', methods=['GET'])
+@log_exceptions
+def list_expenses():
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    expenses = Expense.query.filter_by(
+        user_id=session['user_id']
+    ).order_by(Expense.date.desc()).all()
+
+    monthly_expenses = {}
+    for key, group in groupby(expenses, key=lambda x: (x.date.year, x.date.month)):
+        year, month = key
+        monthly_expenses[f'{year}-{month:02d}'] = list(group)
+
+    return render_template('list_expenses.html', monthly_expenses=monthly_expenses)
+
+
+@app.route('/expense/<int:expense_id>/edit', methods=['GET'])
+@log_exceptions
+def edit_expense_get(expense_id):
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    expense = Expense.query.get_or_404(expense_id)
+
+    if expense.user_id != session['user_id']:
+        flash('Access denied', 'danger')
+        return redirect(url_for('list_expenses'))
+
+    expense_form = ExpenseForm(obj=expense)
+    expense_form.date.data = expense.date.isoformat()
+
+    return render_template('edit_expense.html', expense_form=expense_form, expense=expense)
+
+
+@app.route('/expense/<int:expense_id>/edit', methods=['POST'])
+@log_exceptions
+def edit_expense_post(expense_id):
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    expense = Expense.query.get_or_404(expense_id)
+
+    if expense.user_id != session['user_id']:
+        flash('Access denied', 'danger')
+        return redirect(url_for('list_expenses'))
+
+    expense_form = ExpenseForm(request.form)
+
+    if expense_form.validate_on_submit():
+        try:
+            expense_date = datetime.strptime(expense_form.date.data, '%Y-%m-%d').date()
+        except ValueError:
+            flash('Invalid date format', 'danger')
+            return render_template('edit_expense.html', expense_form=expense_form, expense=expense)
+
+        expense.category_id = expense_form.category_id.data
+        expense.amount = expense_form.amount.data
+        expense.date = expense_date
+        expense.comment = expense_form.comment.data.strip() or None
+
+        try:
+            db.session.commit()
+            flash('Expense updated successfully', 'success')
+            return redirect(url_for('list_expenses'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+            return render_template('edit_expense.html', expense_form=expense_form, expense=expense)
+    else:
+        flash('Incorrect expense data', 'danger')
+        return render_template('edit_expense.html', expense_form=expense_form, expense=expense)
+
+
+@app.route('/expense/<int:expense_id>/delete', methods=['POST'])
+@log_exceptions
+def delete_expense(expense_id):
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    expense = Expense.query.get_or_404(expense_id)
+
+    if expense.user_id != session['user_id']:
+        flash('Access denied', 'danger')
+        return redirect(url_for('list_expenses'))
+
+    try:
+        db.session.delete(expense)
+        db.session.commit()
+        flash('Expense deleted', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred: {str(e)}', 'danger')
+
+    return redirect(url_for('list_expenses'))
