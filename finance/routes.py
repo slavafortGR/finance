@@ -133,9 +133,9 @@ def return_profile():
         total_income = total_main_income + total_additional_income
 
         all_incomes = Income.query.filter_by(user_id=user_id).order_by(
-            Income.year.desc(),
-            Income.month.desc(),
-            Income.day.desc()
+            Income.year.asc(),
+            Income.month.asc(),
+            Income.day.asc()
         ).all()
 
         return render_template('profile.html',
@@ -267,12 +267,14 @@ def list_expenses():
 
     expenses = Expense.query.filter_by(
         user_id=session['user_id']
-    ).order_by(Expense.date.desc()).all()
+    ).order_by(Expense.date.asc()).all()
 
     monthly_expenses = {}
     for key, group in groupby(expenses, key=lambda x: (x.date.year, x.date.month)):
         year, month = key
-        monthly_expenses[f'{year}-{month:02d}'] = list(group)
+        month_key = f'{year}-{month:02d}'
+        expense_list = list(group)
+        monthly_expenses[month_key] = expense_list
 
     return render_template('list_expenses.html', monthly_expenses=monthly_expenses)
 
