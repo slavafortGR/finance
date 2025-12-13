@@ -27,40 +27,40 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% set monthly_total = 0 %}
+                        {% set monthly_total = namespace(value=0) %}
                         {% for expense in expenses %}
-                        {% set monthly_total = monthly_total + expense.amount %}
-                        <tr>
-                            <td>{{ expense.date.strftime('%d.%m.%Y') }}</td>
-                            <td>
-                                <span>{{ expense.category.icon }}</span>
-                                {{ expense.category.display_name }}
-                            </td>
-                            <td><strong class="text-danger">{{ "{:,}".format(expense.amount).replace(',', ' ') }} DKK</strong></td>
-                            <td>{{ expense.comment or '-' }}</td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{{ url_for('edit_expense_get', expense_id=expense.id) }}"
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form method="POST"
-                                          action="{{ url_for('delete_expense', expense_id=expense.id) }}"
-                                          style="display: inline;"
-                                          onsubmit="return confirm('Delete this expense?');">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
+                            {% set monthly_total.value = monthly_total.value + expense.amount %}
+                            <tr>
+                                <td>{{ expense.date.strftime('%d.%m.%Y') }}</td>
+                                <td>
+                                    <span>{{ expense.category.icon }}</span>
+                                    {{ expense.category.display_name }}
+                                </td>
+                                <td><strong class="text-danger">{{ "{:,}".format(expense.amount).replace(',', ' ') }} DKK</strong></td>
+                                <td>{{ expense.comment or '-' }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('edit_expense_get', expense_id=expense.id) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="POST"
+                                              action="{{ url_for('delete_expense', expense_id=expense.id) }}"
+                                              style="display: inline;"
+                                              onsubmit="return confirm('Delete this expense?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                     <tfoot>
                         <tr class="table-danger">
                             <td colspan="2"><strong>Total for {{ month_key }}:</strong></td>
-                            <td colspan="3"><strong>{{ "{:,}".format(monthly_total).replace(',', ' ') }} DKK</strong></td>
+                            <td colspan="3"><strong>{{ "{:,}".format(monthly_total.value).replace(',', ' ') }} DKK</strong></td>
                         </tr>
                     </tfoot>
                 </table>

@@ -15,14 +15,14 @@
         </div>
         <div class="mb-3">
             <label class="form-label"><strong>Main income:</strong></label>
-            {{ income_form.main_income(class="form-control", required=True, placeholder="0") }} DKK
+            {{ income_form.main_income(class="form-control", placeholder="0") }} DKK
             {% for error in income_form.main_income.errors %}
                     <span class="text-danger">{{ error }}</span>
             {% endfor %}
         </div>
         <div class="mb-3">
             <label class="form-label"><strong>Additional income:</strong></label>
-            {{ income_form.additional_income(class="form-control", required=True, placeholder="0") }} DKK
+            {{ income_form.additional_income(class="form-control", placeholder="0") }} DKK
             {% for error in income_form.additional_income.errors %}
                     <span class="text-danger">{{ error }}</span>
             {% endfor %}

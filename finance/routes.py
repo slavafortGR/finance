@@ -123,28 +123,48 @@ def return_profile():
         current_year = current_date.year
         current_month = current_date.month
 
-        incomes = Income.query.filter_by(user_id=user_id).filter(
-            Income.year == current_year,
-            Income.month == current_month
-        ).order_by(Income.day.asc()).all()
-
-        total_main_income = sum(income.main_income for income in incomes)
-        total_additional_income = sum(income.additional_income for income in incomes)
-        total_income = total_main_income + total_additional_income
-
         all_incomes = Income.query.filter_by(user_id=user_id).order_by(
-            Income.year.asc(),
-            Income.month.asc(),
+            Income.year.desc(),
+            Income.month.desc(),
             Income.day.asc()
         ).all()
+
+        monthly_incomes = {}
+        for key, group in groupby(all_incomes, key=lambda x: (x.year, x.month)):
+            year, month = key
+            month_key = f'{year}-{month:02d}'
+            income_list = list(group)
+
+            total_main = sum(inc.main_income for inc in income_list)
+            total_additional = sum(inc.additional_income for inc in income_list)
+            total = total_main + total_additional
+
+            monthly_incomes[month_key] = {
+                'incomes': income_list,
+                'total_main': total_main,
+                'total_additional': total_additional,
+                'total': total,
+                'year': year,
+                'month': month
+            }
+
+        current_month_key = f'{current_year}-{current_month:02d}'
+        if current_month_key in monthly_incomes:
+            current_month_data = monthly_incomes[current_month_key]
+            total_main_income = current_month_data['total_main']
+            total_additional_income = current_month_data['total_additional']
+            total_income = current_month_data['total']
+        else:
+            total_main_income = 0
+            total_additional_income = 0
+            total_income = 0
 
         return render_template('profile.html',
                                user=user,
                                total_main_income=total_main_income,
                                total_additional_income=total_additional_income,
                                total_income=total_income,
-                               incomes=incomes,
-                               all_incomes=all_incomes,
+                               monthly_incomes=monthly_incomes,
                                current_year=current_year,
                                current_month=current_month)
     else:
@@ -183,6 +203,13 @@ def add_income_post():
             day = int(day)
         except (ValueError, AttributeError):
             flash('Invalid date format', 'danger')
+            return render_template('add_income.html', income_form=income_form)
+
+        main_income = income_form.main_income.data or 0
+        additional_income = income_form.additional_income.data or 0
+
+        if main_income == 0 and additional_income == 0:
+            flash('At least one income field must be filled', 'danger')
             return render_template('add_income.html', income_form=income_form)
 
         new_income = Income(
