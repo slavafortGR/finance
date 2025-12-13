@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% if login_tab %}
+    <div class="content-wrapper">
+        <h2>Sing in</h2>
+        <form action="/login" method="POST">
+            <div class="mb-3">
+                {{ login_form.hidden_tag() }}
+                <label class="form-label"><strong>Nick:</strong></label>
+                {{ login_form.nick_name(class="form-control", required=True, autofocus=True) }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label"><strong>Password:</strong></label>
+                {{ login_form.password(class="form-control", required=True) }}
+            </div>
+            <input type="submit" class="btn btn-success" value="Sing in">
+        </form>
+    </div>
+{% endif %}
+
+{% if register_tab %}
+<div class="content-wrapper">
+    <h2>Sing up</h2>
+    <form action="/register" method="POST">
+        <div class="mb-3">
+            {{ registration_form.hidden_tag() }}
+            <label class="form-label"><strong>Nick:</strong></label>
+            {{ registration_form.nick_name(class="form-control", required=False, autofocus=True) }}
+            {% for error in registration_form.nick_name.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            <label class="form-label"><strong>Password:</strong></label>
+            {{ registration_form.password(class="form-control", required=True) }}
+            {% for error in registration_form.password.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            <label class="form-label"><strong>Confirm password:</strong></label>
+            {{ registration_form.confirm_password(class="form-control", required=True) }}
+            {% for error in registration_form.confirm_password.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <input type="submit" class="btn btn-success" value="Sing up">
+    </form>
+</div>
+{% endif %}
+{% endblock %}

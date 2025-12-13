@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3>Hi, <strong>{{ user.nick_name }}</strong>!</h3>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Income for {{ '%02d' % current_month }}.{{ current_year }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <div class="p-3 bg-success text-white rounded">
+                        <h5>Main Income</h5>
+                        <h3>{{ "{:,}".format(total_main_income).replace(',', ' ') }} DKK</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-info text-white rounded">
+                        <h5>Additional Income</h5>
+                        <h3>{{ "{:,}".format(total_additional_income).replace(',', ' ') }} DKK</h3>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-warning text-white rounded">
+                        <h5>Total Income</h5>
+                        <h3>{{ "{:,}".format(total_income).replace(',', ' ') }} DKK</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Income details for this month</h5>
+        </div>
+        <div class="card-body">
+            {% if incomes %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Main Income</th>
+                            <th>Additional Income</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for income in incomes %}
+                        <tr>
+                            <td>{{ '%02d' % income.day }}.{{ '%02d' % income.month }}.{{ income.year }}</td>
+                            <td>{{ "{:,}".format(income.main_income).replace(',', ' ') }} DKK</td>
+                            <td>{{ "{:,}".format(income.additional_income).replace(',', ' ') }} DKK</td>
+                            <td><strong>{{ "{:,}".format(income.total).replace(',', ' ') }} DKK</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No income for this month</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Income History</h5>
+        </div>
+        <div class="card-body">
+            {% if all_incomes %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Main Income</th>
+                            <th>Additional Income</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for income in all_incomes %}
+                        <tr>
+                            <td>{{ '%02d' % income.day }}.{{ '%02d' % income.month }}.{{ income.year }}</td>
+                            <td>{{ "{:,}".format(income.main_income).replace(',', ' ') }} DKK</td>
+                            <td>{{ "{:,}".format(income.additional_income).replace(',', ' ') }} DKK</td>
+                            <td><strong>{{ "{:,}".format(income.total).replace(',', ' ') }} DKK</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-info">
+                    <p class="mb-0">
+                        <strong>There is no data to display.</strong>
+                        Please add data to the database.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <a href="/income" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Add Income
+        </a>
+
+        <a href="/expense" class="btn btn-danger">
+            <i class="bi bi-plus-circle"></i> Add Expense
+        </a>
+        <a href="/expenses" class="btn btn-outline-danger">
+            <i class="bi bi-list-ul"></i> View Expenses
+        </a>
+
+        <a href="/logout" class="btn btn-secondary ms-auto">
+            <i class="bi bi-box-arrow-right"></i> Log out
+        </a>
+    </div>
+</div>
+{% endblock %}
