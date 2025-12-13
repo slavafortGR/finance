@@ -126,7 +126,7 @@ def return_profile():
         incomes = Income.query.filter_by(user_id=user_id).filter(
             Income.year == current_year,
             Income.month == current_month
-        ).all()
+        ).order_by(Income.day.asc()).all()
 
         total_main_income = sum(income.main_income for income in incomes)
         total_additional_income = sum(income.additional_income for income in incomes)
