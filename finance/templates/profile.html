@@ -2,40 +2,49 @@
 
 {% block content %}
 <div class="container mt-4">
+    <!-- Приветствие -->
     <div class="card mb-4">
         <div class="card-body">
             <h3>Hi, <strong>{{ user.nick_name }}</strong>!</h3>
         </div>
     </div>
 
+    <!-- Итоги за текущий месяц -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Income for {{ '%02d' % current_month }}.{{ current_year }}</h4>
+            <h4 class="mb-0">Summary for {{ '%02d' % current_month }}.{{ current_year }}</h4>
         </div>
         <div class="card-body">
             <div class="row text-center">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="p-3 bg-success text-white rounded">
-                        <h5>Main Income</h5>
-                        <h3>{{ "{:,}".format(total_main_income).replace(',', ' ') }} DKK</h3>
+                        <h6>Main Income</h6>
+                        <h4>{{ "{:,}".format(total_main_income).replace(',', ' ') }} DKK</h4>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="p-3 bg-info text-white rounded">
-                        <h5>Additional Income</h5>
-                        <h3>{{ "{:,}".format(total_additional_income).replace(',', ' ') }} DKK</h3>
+                        <h6>Additional Income</h6>
+                        <h4>{{ "{:,}".format(total_additional_income).replace(',', ' ') }} DKK</h4>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="p-3 bg-warning text-white rounded">
-                        <h5>Total Income</h5>
-                        <h3>{{ "{:,}".format(total_income).replace(',', ' ') }} DKK</h3>
+                <div class="col-md-3">
+                    <div class="p-3 bg-danger text-white rounded">
+                        <h6>Total Expenses</h6>
+                        <h4>{{ "{:,}".format(total_expenses).replace(',', ' ') }} DKK</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 {% if balance >= 0 %}bg-primary{% else %}bg-warning{% endif %} text-white rounded">
+                        <h6>Balance</h6>
+                        <h4>{{ "{:,}".format(balance).replace(',', ' ') }} DKK</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Доходы по месяцам -->
     {% if monthly_incomes %}
         {% for month_key, data in monthly_incomes.items() %}
         <div class="card mb-3">
@@ -49,9 +58,17 @@
                         } %}
                         {{ month_names[data.month] }} {{ data.year }}
                     </h5>
-                    <span class="badge bg-success">
-                        Total: {{ "{:,}".format(data.total).replace(',', ' ') }} DKK
-                    </span>
+                    <div>
+                        <span class="badge bg-success me-1">
+                            Income: {{ "{:,}".format(data.total).replace(',', ' ') }} DKK
+                        </span>
+                        <span class="badge bg-danger me-1">
+                            Expenses: {{ "{:,}".format(data.expenses).replace(',', ' ') }} DKK
+                        </span>
+                        <span class="badge {% if data.balance >= 0 %}bg-primary{% else %}bg-warning{% endif %}">
+                            Balance: {{ "{:,}".format(data.balance).replace(',', ' ') }} DKK
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="card-body">
@@ -97,6 +114,7 @@
                             <td><strong>{{ "{:,}".format(data.total_main).replace(',', ' ') }} DKK</strong></td>
                             <td><strong>{{ "{:,}".format(data.total_additional).replace(',', ' ') }} DKK</strong></td>
                             <td><strong>{{ "{:,}".format(data.total).replace(',', ' ') }} DKK</strong></td>
+                            <td></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -116,6 +134,7 @@
         </div>
     {% endif %}
 
+    <!-- Кнопки действий -->
     <div class="d-flex gap-2 mb-4">
         <a href="/income" class="btn btn-success">
             <i class="bi bi-plus-circle"></i> Add Income
