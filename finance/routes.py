@@ -236,6 +236,104 @@ def add_income_post():
         return render_template('add_income.html', income_form=income_form)
 
 
+@app.route('/income/<int:income_id>/edit', methods=['GET'])
+@log_exceptions
+def edit_income_get(income_id):
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    income = Income.query.get_or_404(income_id)
+
+    if income.user_id != session['user_id']:
+        flash('Access denied', 'danger')
+        return redirect(url_for('return_profile'))
+
+    income_form = IncomeForm()
+    income_form.date.data = f'{income.year}-{income.month:02d}-{income.day:02d}'
+    income_form.main_income.data = income.main_income
+    income_form.additional_income.data = income.additional_income
+
+    return render_template('edit_income.html', income_form=income_form, income=income)
+
+
+@app.route('/income/<int:income_id>/edit', methods=['POST'])
+@log_exceptions
+def edit_income_post(income_id):
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    income = Income.query.get_or_404(income_id)
+
+    if income.user_id != session['user_id']:
+        flash('Access denied', 'danger')
+        return redirect(url_for('return_profile'))
+
+    income_form = IncomeForm(request.form)
+
+    if income_form.validate_on_submit():
+        date_str = income_form.date.data
+
+        try:
+            year, month, day = date_str.split('-')
+            year = int(year)
+            month = int(month)
+            day = int(day)
+        except (ValueError, AttributeError):
+            flash('Invalid date format', 'danger')
+            return render_template('edit_income.html', income_form=income_form, income=income)
+
+        main_income = income_form.main_income.data or 0
+        additional_income = income_form.additional_income.data or 0
+
+        if main_income == 0 and additional_income == 0:
+            flash('At least one income field must be filled', 'danger')
+            return render_template('edit_income.html', income_form=income_form, income=income)
+
+        income.year = year
+        income.month = month
+        income.day = day
+        income.main_income = main_income
+        income.additional_income = additional_income
+
+        try:
+            db.session.commit()
+            flash('Income updated successfully', 'success')
+            return redirect(url_for('return_profile'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+            return render_template('edit_income.html', income_form=income_form, income=income)
+    else:
+        flash('Incorrect income data', 'danger')
+        return render_template('edit_income.html', income_form=income_form, income=income)
+
+
+@app.route('/income/<int:income_id>/delete', methods=['POST'])
+@log_exceptions
+def delete_income(income_id):
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    income = Income.query.get_or_404(income_id)
+
+    if income.user_id != session['user_id']:
+        flash('Access denied', 'danger')
+        return redirect(url_for('return_profile'))
+
+    try:
+        db.session.delete(income)
+        db.session.commit()
+        flash('Income deleted', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred: {str(e)}', 'danger')
+
+    return redirect(url_for('return_profile'))
+
+
 @app.route('/expense', methods=['GET'])
 @log_exceptions
 def add_expense_get():
