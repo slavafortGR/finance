@@ -195,12 +195,14 @@ def return_profile():
 @app.route('/income', methods=['GET'])
 @log_exceptions
 def add_income_get():
-    income_form = IncomeForm(request.form)
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
 
-    if 'user_id' in session:
-        return render_template('add_income.html', income_form=income_form)
-    flash('You need login', 'danger')
-    return redirect(url_for('login_user_get'))
+    income_form = IncomeForm()
+    return render_template('add_income.html',
+                           income_form=income_form,
+                           today=date.today().isoformat())
 
 
 @app.route('/income', methods=['POST'])
@@ -221,6 +223,12 @@ def add_income_post():
             year = int(year)
             month = int(month)
             day = int(day)
+
+            input_date = date(year, month, day)
+            if input_date > date.today():
+                flash('Cannot add income for future dates', 'danger')
+                return render_template('add_income.html', income_form=income_form)
+
         except (ValueError, AttributeError):
             flash('Invalid date format', 'danger')
             return render_template('add_income.html', income_form=income_form)
@@ -237,8 +245,8 @@ def add_income_post():
             year=year,
             month=month,
             day=day,
-            main_income=income_form.main_income.data,
-            additional_income=income_form.additional_income.data
+            main_income=main_income,
+            additional_income=additional_income
         )
 
         try:
@@ -362,7 +370,9 @@ def add_expense_get():
         return redirect(url_for('login_user_get'))
 
     expense_form = ExpenseForm()
-    return render_template('add_expense.html', expense_form=expense_form)
+    return render_template('add_expense.html',
+                           expense_form=expense_form,
+                           today=date.today().isoformat())
 
 
 @app.route('/expense', methods=['POST'])
@@ -377,6 +387,11 @@ def add_expense_post():
     if expense_form.validate_on_submit():
         try:
             expense_date = datetime.strptime(expense_form.date.data, '%Y-%m-%d').date()
+
+            if expense_date > date.today():
+                flash('Cannot add expense for future dates', 'danger')
+                return render_template('add_expense.html', expense_form=expense_form)
+
         except ValueError:
             flash('Invalid date format', 'danger')
             return render_template('add_expense.html', expense_form=expense_form)
@@ -412,14 +427,14 @@ def list_expenses():
 
     expenses = Expense.query.filter_by(
         user_id=session['user_id']
-    ).order_by(Expense.date.asc()).all()
+    ).order_by(Expense.date.desc()).all()
+
+    from itertools import groupby
 
     monthly_expenses = {}
     for key, group in groupby(expenses, key=lambda x: (x.date.year, x.date.month)):
         year, month = key
-        month_key = f'{year}-{month:02d}'
-        expense_list = list(group)
-        monthly_expenses[month_key] = expense_list
+        monthly_expenses[f'{year}-{month:02d}'] = list(group)
 
     return render_template('list_expenses.html', monthly_expenses=monthly_expenses)
 
