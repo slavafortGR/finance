@@ -2,14 +2,12 @@
 
 {% block content %}
 <div class="container mt-4">
-    <!-- Приветствие -->
     <div class="card mb-4">
         <div class="card-body">
             <h3>Hi, <strong>{{ user.nick_name }}</strong>!</h3>
         </div>
     </div>
 
-    <!-- Итоги за текущий месяц -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0">Summary for {{ '%02d' % current_month }}.{{ current_year }}</h4>
@@ -44,7 +42,6 @@
         </div>
     </div>
 
-    <!-- Доходы по месяцам -->
     {% if monthly_incomes %}
         {% for month_key, data in monthly_incomes.items() %}
         <div class="card mb-3">
@@ -134,7 +131,6 @@
         </div>
     {% endif %}
 
-    <!-- Кнопки действий -->
     <div class="d-flex gap-2 mb-4">
         <a href="/income" class="btn btn-success">
             <i class="bi bi-plus-circle"></i> Add Income

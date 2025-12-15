@@ -111,9 +111,6 @@ def logout():
     return redirect(url_for('return_main_page'))
 
 
-from itertools import groupby
-
-
 @app.route('/profile', methods=['GET'])
 @log_exceptions
 def return_profile():
@@ -122,29 +119,24 @@ def return_profile():
     if user_id:
         user = User.query.filter_by(id=user_id).first()
 
-        # Получаем текущий месяц и год
         current_date = date.today()
         current_year = current_date.year
         current_month = current_date.month
 
-        # Получаем ВСЕ доходы пользователя с сортировкой
         all_incomes = Income.query.filter_by(user_id=user_id).order_by(
             Income.year.desc(),
             Income.month.desc(),
             Income.day.asc()
         ).all()
 
-        # Получаем ВСЕ расходы пользователя
         all_expenses = Expense.query.filter_by(user_id=user_id).all()
 
-        # Группируем доходы по месяцам
         monthly_incomes = {}
         for key, group in groupby(all_incomes, key=lambda x: (x.year, x.month)):
             year, month = key
             month_key = f'{year}-{month:02d}'
             income_list = list(group)
 
-            # Считаем итоги доходов для месяца
             total_main = sum(inc.main_income for inc in income_list)
             total_additional = sum(inc.additional_income for inc in income_list)
             total = total_main + total_additional
@@ -158,7 +150,6 @@ def return_profile():
                 'month': month
             }
 
-        # Группируем расходы по месяцам и считаем суммы
         monthly_expenses = {}
         for expense in all_expenses:
             month_key = f'{expense.date.year}-{expense.date.month:02d}'
@@ -166,13 +157,11 @@ def return_profile():
                 monthly_expenses[month_key] = 0
             monthly_expenses[month_key] += expense.amount
 
-        # Добавляем расходы и баланс к каждому месяцу
         for month_key in monthly_incomes:
             expenses_total = monthly_expenses.get(month_key, 0)
             monthly_incomes[month_key]['expenses'] = expenses_total
             monthly_incomes[month_key]['balance'] = monthly_incomes[month_key]['total'] - expenses_total
 
-        # Данные для текущего месяца (для карточек сверху)
         current_month_key = f'{current_year}-{current_month:02d}'
         if current_month_key in monthly_incomes:
             current_month_data = monthly_incomes[current_month_key]
