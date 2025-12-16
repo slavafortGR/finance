@@ -4,9 +4,17 @@
 <div class="content-wrapper">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>My Expenses</h2>
-        <a href="{{ url_for('add_expense_get') }}" class="btn btn-success">
-            <i class="bi bi-plus-lg"></i> Add Expense
-        </a>
+        <div class="btn-group">
+            <a href="{{ url_for('add_expense_get') }}" class="btn btn-danger">
+                <i class="bi bi-plus-lg"></i> Add Expense
+            </a>
+            <a href="{{ url_for('add_income_get') }}" class="btn btn-success">
+                <i class="bi bi-plus-lg"></i> Add Income
+            </a>
+            <a href="{{ url_for('return_profile') }}" class="btn btn-outline-primary">
+                <i class="bi bi-house-door"></i> Profile
+            </a>
+        </div>
     </div>
 
     {% if monthly_expenses %}

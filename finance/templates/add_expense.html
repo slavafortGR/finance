@@ -44,8 +44,18 @@
         </div>
 
         <div class="d-flex gap-2">
-            <input type="submit" class="btn btn-success" value="Save">
-            <a href="{{ url_for('list_expenses') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Save
+            </button>
+            <a href="{{ url_for('list_expenses') }}" class="btn btn-outline-primary">
+                <i class="bi bi-list-ul"></i> All Expenses
+            </a>
+            <a href="{{ url_for('return_profile') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Profile
+            </a>
+            <a href="{{ url_for('add_income_get') }}" class="btn btn-outline-success">
+                <i class="bi bi-plus-circle"></i> Add Income
+            </a>
         </div>
     </form>
 </div>

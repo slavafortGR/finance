@@ -52,6 +52,8 @@ def login_user_post():
 
         user = User.query.filter_by(nick_name=nick_name).first()
         if not user or not check_password_hash(user.password, password):
+            session['user_id'] = user.id
+            session['user_nick'] = user.nick_name
             flash('Incorrect login or password', 'danger')
             return redirect(url_for('login_user_get'))
         else:
