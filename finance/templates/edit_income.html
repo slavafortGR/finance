@@ -1,56 +1,59 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="content-wrapper">
-    <h2>Edit Income</h2>
+<div class="max-w-2xl mx-auto">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-3xl">
+                <i class="bi bi-pencil text-primary"></i>
+                Edit Income
+            </h2>
 
-    <form action="{{ url_for('edit_income_post', income_id=income.id) }}" method="POST">
-        {{ income_form.hidden_tag() }}
+            <form action="{{ url_for('edit_income_post', income_id=income.id) }}" method="POST" class="space-y-4">
+                {{ income_form.hidden_tag() }}
 
-        <div class="mb-3">
-            <label class="form-label"><strong>Date:</strong></label>
-            {{ income_form.date(class="form-control", required=True, type="date") }}
-            {% for error in income_form.date.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Date</span>
+                    </label>
+                    {{ income_form.date(class="input input-bordered w-full", required=True, type="date") }}
+                    {% for error in income_form.date.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Main Income</span>
+                    </label>
+                    <label class="input-group">
+                        {{ income_form.main_income(class="input input-bordered w-full") }}
+                        <span>DKK</span>
+                    </label>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Additional Income</span>
+                    </label>
+                    <label class="input-group">
+                        {{ income_form.additional_income(class="input input-bordered w-full") }}
+                        <span>DKK</span>
+                    </label>
+                </div>
+
+                <div class="card-actions justify-end gap-2">
+                    <button type="submit" class="btn btn-success gap-2">
+                        <i class="bi bi-save"></i> Update
+                    </button>
+                    <a href="{{ url_for('return_profile') }}" class="btn btn-ghost gap-2">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+                </div>
+            </form>
         </div>
-
-        <div class="mb-3">
-            <label class="form-label"><strong>Main income:</strong></label>
-            <div class="input-group">
-                {{ income_form.main_income(class="form-control", placeholder="0") }}
-                <span class="input-group-text">DKK</span>
-            </div>
-            <small class="text-muted">Optional - leave at 0 if not applicable</small>
-            {% for error in income_form.main_income.errors %}
-                <span class="text-danger d-block">{{ error }}</span>
-            {% endfor %}
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label"><strong>Additional income:</strong></label>
-            <div class="input-group">
-                {{ income_form.additional_income(class="form-control", placeholder="0") }}
-                <span class="input-group-text">DKK</span>
-            </div>
-            <small class="text-muted">Optional - leave at 0 if not applicable</small>
-            {% for error in income_form.additional_income.errors %}
-                <span class="text-danger d-block">{{ error }}</span>
-            {% endfor %}
-        </div>
-
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> At least one income field must be greater than 0
-        </div>
-
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-save"></i> Update
-            </button>
-            <a href="{{ url_for('return_profile') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Cancel
-            </a>
-        </div>
-    </form>
+    </div>
 </div>
 {% endblock %}

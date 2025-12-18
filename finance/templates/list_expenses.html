@@ -1,30 +1,29 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="content-wrapper">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>My Expenses</h2>
-        <div class="btn-group">
-            <a href="{{ url_for('add_expense_get') }}" class="btn btn-danger">
-                <i class="bi bi-plus-lg"></i> Add Expense
-            </a>
-            <a href="{{ url_for('add_income_get') }}" class="btn btn-success">
-                <i class="bi bi-plus-lg"></i> Add Income
-            </a>
-            <a href="{{ url_for('return_profile') }}" class="btn btn-outline-primary">
-                <i class="bi bi-house-door"></i> Profile
-            </a>
-        </div>
+<div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+    <h2 class="text-3xl font-bold">My Expenses</h2>
+    <div class="join">
+        <a href="{{ url_for('add_expense_get') }}" class="btn btn-error join-item gap-2">
+            <i class="bi bi-plus-lg"></i> Add Expense
+        </a>
+        <a href="{{ url_for('add_income_get') }}" class="btn btn-success join-item gap-2">
+            <i class="bi bi-plus-lg"></i> Add Income
+        </a>
+        <a href="{{ url_for('return_profile') }}" class="btn btn-outline join-item gap-2">
+            <i class="bi bi-house-door"></i> Profile
+        </a>
     </div>
+</div>
 
-    {% if monthly_expenses %}
-        {% for month_key, expenses in monthly_expenses.items() %}
-        <div class="card mb-3">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">{{ month_key }}</h5>
-            </div>
-            <div class="card-body">
-                <table class="table table-hover mb-0">
+{% if monthly_expenses %}
+    {% for month_key, expenses in monthly_expenses.items() %}
+    <div class="card bg-base-100 shadow-xl mb-6">
+        <div class="card-body">
+            <h3 class="card-title text-xl">{{ month_key }}</h3>
+
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -41,22 +40,28 @@
                             <tr>
                                 <td>{{ expense.date.strftime('%d.%m.%Y') }}</td>
                                 <td>
-                                    <span>{{ expense.category.icon }}</span>
-                                    {{ expense.category.display_name }}
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-2xl">{{ expense.category.icon }}</span>
+                                        <span>{{ expense.category.display_name }}</span>
+                                    </div>
                                 </td>
-                                <td><strong class="text-danger">{{ "{:,}".format(expense.amount).replace(',', ' ') }} DKK</strong></td>
+                                <td>
+                                    <span class="badge badge-error badge-lg">
+                                        {{ "{:,}".format(expense.amount).replace(',', ' ') }} DKK
+                                    </span>
+                                </td>
                                 <td>{{ expense.comment or '-' }}</td>
                                 <td>
-                                    <div class="btn-group">
+                                    <div class="join">
                                         <a href="{{ url_for('edit_expense_get', expense_id=expense.id) }}"
-                                           class="btn btn-sm btn-outline-primary">
+                                           class="btn btn-sm btn-primary join-item gap-1">
                                             <i class="bi bi-pencil"></i> Edit
                                         </a>
                                         <form method="POST"
                                               action="{{ url_for('delete_expense', expense_id=expense.id) }}"
                                               style="display: inline;"
                                               onsubmit="return confirm('Delete this expense?');">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <button type="submit" class="btn btn-sm btn-error join-item gap-1">
                                                 <i class="bi bi-trash"></i> Delete
                                             </button>
                                         </form>
@@ -66,19 +71,29 @@
                         {% endfor %}
                     </tbody>
                     <tfoot>
-                        <tr class="table-danger">
+                        <tr class="bg-error/10">
                             <td colspan="2"><strong>Total for {{ month_key }}:</strong></td>
-                            <td colspan="3"><strong>{{ "{:,}".format(monthly_total.value).replace(',', ' ') }} DKK</strong></td>
+                            <td colspan="3">
+                                <span class="badge badge-error badge-lg">
+                                    <strong>{{ "{:,}".format(monthly_total.value).replace(',', ' ') }} DKK</strong>
+                                </span>
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
-        {% endfor %}
-    {% else %}
-        <div class="alert alert-info">
-            <p class="mb-0">No expenses yet. <a href="{{ url_for('add_expense_get') }}">Add your first expense</a></p>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle text-2xl"></i>
+        <div>
+            <h3 class="font-bold">No expenses yet</h3>
+            <div class="text-xs">
+                <a href="{{ url_for('add_expense_get') }}" class="link">Add your first expense</a>
+            </div>
         </div>
-    {% endif %}
-</div>
+    </div>
+{% endif %}
 {% endblock %}

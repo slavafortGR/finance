@@ -1,117 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-          name="viewport">
-    <meta content="ie=edge" http-equiv="X-UA-Compatible">
-    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Finance Tracker{% endblock %}</title>
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .navbar {
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-        .nav-link {
-            color: #495057;
-            font-weight: 500;
-        }
-        .nav-link:hover {
-            color: #0d6efd;
-        }
-        .nav-link.active {
-            color: #0d6efd;
-            border-bottom: 2px solid #0d6efd;
-        }
-    </style>
+
+    <!-- DaisyUI + Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 </head>
-<body class="p-3 mb-2 bg-warning text-emphasis-success">
+<body class="bg-base-200">
 
 {% if 'user_id' in session %}
-<!-- Навигационное меню -->
-<nav class="navbar navbar-expand-lg navbar-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{{ url_for('return_profile') }}">
+<!-- Навигация -->
+<div class="navbar bg-base-100 shadow-lg">
+    <div class="navbar-start">
+        <div class="dropdown">
+            <label tabindex="0" class="btn btn-ghost lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                </svg>
+            </label>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a href="{{ url_for('return_profile') }}"><i class="bi bi-house-door"></i> Profile</a></li>
+                <li><a href="{{ url_for('add_income_get') }}"><i class="bi bi-plus-circle"></i> Add Income</a></li>
+                <li><a href="{{ url_for('add_expense_get') }}"><i class="bi bi-plus-circle"></i> Add Expense</a></li>
+                <li><a href="{{ url_for('list_expenses') }}"><i class="bi bi-list-ul"></i> All Expenses</a></li>
+            </ul>
+        </div>
+        <a href="{{ url_for('return_profile') }}" class="btn btn-ghost text-xl">
             <i class="bi bi-wallet2"></i> Finance Tracker
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'return_profile' %}active{% endif %}"
-                       href="{{ url_for('return_profile') }}">
-                        <i class="bi bi-house-door"></i> Profile
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'add_income_get' %}active{% endif %}"
-                       href="{{ url_for('add_income_get') }}">
-                        <i class="bi bi-plus-circle"></i> Add Income
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'add_expense_get' %}active{% endif %}"
-                       href="{{ url_for('add_expense_get') }}">
-                        <i class="bi bi-plus-circle"></i> Add Expense
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'list_expenses' %}active{% endif %}"
-                       href="{{ url_for('list_expenses') }}">
-                        <i class="bi bi-list-ul"></i> All Expenses
-                    </a>
-                </li>
-            </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <span class="navbar-text me-3">
-                        <i class="bi bi-person-circle"></i> {{ session.get('user_nick', 'User') }}
-                    </span>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="/logout">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </a>
-                </li>
+    </div>
+
+    <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+            <li><a href="{{ url_for('return_profile') }}" class="{% if request.endpoint == 'return_profile' %}active{% endif %}">
+                <i class="bi bi-house-door"></i> Profile
+            </a></li>
+            <li><a href="{{ url_for('add_income_get') }}" class="{% if request.endpoint == 'add_income_get' %}active{% endif %}">
+                <i class="bi bi-plus-circle"></i> Add Income
+            </a></li>
+            <li><a href="{{ url_for('add_expense_get') }}" class="{% if request.endpoint == 'add_expense_get' %}active{% endif %}">
+                <i class="bi bi-plus-circle"></i> Add Expense
+            </a></li>
+            <li><a href="{{ url_for('list_expenses') }}" class="{% if request.endpoint == 'list_expenses' %}active{% endif %}">
+                <i class="bi bi-list-ul"></i> All Expenses
+            </a></li>
+        </ul>
+    </div>
+
+    <div class="navbar-end gap-2">
+        <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                <div class="w-10 rounded-full">
+                    <i class="bi bi-person-circle text-3xl"></i>
+                </div>
+            </label>
+            <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                <li class="menu-title">{{ session.get('user_nick', 'User') }}</li>
+                <li><a href="/logout" class="text-error"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
             </ul>
         </div>
     </div>
-</nav>
+</div>
 {% endif %}
 
-<!-- Flash messages -->
-<div class="container">
+<!-- Flash Messages -->
+<div class="container mx-auto px-4 py-4">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        <ul class="flash list-unstyled">
-            {% for category, message in messages %}
-            <li class="alert alert-{{ category }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </li>
-            {% endfor %}
-        </ul>
+        {% for category, message in messages %}
+        <div role="alert" class="alert alert-{{ 'error' if category == 'danger' else category }} mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
     {% endif %}
     {% endwith %}
 </div>
 
 <!-- Content -->
-<div>
+<div class="container mx-auto px-4 py-6">
     {% block content %}
     {% endblock %}
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
