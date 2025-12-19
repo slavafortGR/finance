@@ -1,62 +1,97 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="content-wrapper">
-    <h2>Add Expense</h2>
+<div class="max-w-2xl mx-auto">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title text-3xl">
+                <i class="bi bi-cart text-error"></i>
+                Add Expense
+            </h2>
 
-    <form action="/expense" method="POST">
-        {{ expense_form.hidden_tag() }}
-        
-        <div class="mb-3">
-            <label class="form-label"><strong>Category:</strong></label>
-            {{ expense_form.category_id(class="form-select", required=True) }}
-            {% for error in expense_form.category_id.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
-        </div>
-        
-        <div class="mb-3">
-            <label class="form-label"><strong>Amount:</strong></label>
-            <div class="input-group">
-                {{ expense_form.amount(class="form-control", required=True, placeholder="0") }}
-                <span class="input-group-text">DKK</span>
-            </div>
-            {% for error in expense_form.amount.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
-        </div>
-        
-        <div class="mb-3">
-            <label class="form-label"><strong>Date:</strong></label>
-            {{ expense_form.date(class="form-control", required=True, type="date", max=today) }}
-            <small class="text-muted">You can only add expense for today or past dates</small>
-            {% for error in expense_form.date.errors %}
-                <span class="text-danger d-block">{{ error }}</span>
-            {% endfor %}
-        </div>
+            <form action="/expense" method="POST" class="space-y-4">
+                {{ expense_form.hidden_tag() }}
 
-        <div class="mb-3">
-            <label class="form-label"><strong>Comment (optional):</strong></label>
-            {{ expense_form.comment(class="form-control", rows="3", placeholder="e.g., Weekly groceries...") }}
-            {% for error in expense_form.comment.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
-        </div>
+                <!-- Category -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Category</span>
+                    </label>
+                    <select name="category_id" class="select select-bordered w-full" required>
+                        <option value="" disabled selected>Select category</option>
+                        {% for choice in expense_form.category_id.choices %}
+                        <option value="{{ choice[0] }}">{{ choice[1] }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in expense_form.category_id.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-save"></i> Save
-            </button>
-            <a href="{{ url_for('list_expenses') }}" class="btn btn-outline-primary">
-                <i class="bi bi-list-ul"></i> All Expenses
-            </a>
-            <a href="{{ url_for('return_profile') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Back to Profile
-            </a>
-            <a href="{{ url_for('add_income_get') }}" class="btn btn-outline-success">
-                <i class="bi bi-plus-circle"></i> Add Income
-            </a>
+                <!-- Amount -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Amount</span>
+                    </label>
+                    <label class="input-group">
+                        {{ expense_form.amount(class="input input-bordered w-full", required=True, placeholder="0") }}
+                        <span>DKK</span>
+                    </label>
+                    {% for error in expense_form.amount.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Date -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Date</span>
+                    </label>
+                    {{ expense_form.date(class="input input-bordered w-full", required=True, type="date", max=today) }}
+                    <label class="label">
+                        <span class="label-text-alt">You can only add expense for today or past dates</span>
+                    </label>
+                    {% for error in expense_form.date.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Comment -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Comment (optional)</span>
+                    </label>
+                    {{ expense_form.comment(class="textarea textarea-bordered w-full", rows="3", placeholder="e.g., Weekly groceries...") }}
+                    {% for error in expense_form.comment.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Buttons -->
+                <div class="card-actions justify-end gap-2 flex-wrap">
+                    <button type="submit" class="btn btn-success gap-2">
+                        <i class="bi bi-save"></i> Save
+                    </button>
+                    <a href="{{ url_for('list_expenses') }}" class="btn btn-outline btn-primary gap-2">
+                        <i class="bi bi-list-ul"></i> All Expenses
+                    </a>
+                    <a href="{{ url_for('return_profile') }}" class="btn btn-ghost gap-2">
+                        <i class="bi bi-arrow-left"></i> Profile
+                    </a>
+                    <a href="{{ url_for('add_income_get') }}" class="btn btn-outline btn-success gap-2">
+                        <i class="bi bi-plus-circle"></i> Add Income
+                    </a>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}

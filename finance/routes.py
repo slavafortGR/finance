@@ -248,7 +248,8 @@ def add_income_post():
             month=month,
             day=day,
             main_income=main_income,
-            additional_income=additional_income
+            additional_income=additional_income,
+            comment=income_form.comment.data.strip() or None
         )
 
         try:
@@ -326,6 +327,7 @@ def edit_income_post(income_id):
         income.day = day
         income.main_income = main_income
         income.additional_income = additional_income
+        income.comment = income_form.comment.data.strip() or None
 
         try:
             db.session.commit()

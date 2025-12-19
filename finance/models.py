@@ -30,9 +30,10 @@ class Income(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     year = db.Column(db.Integer, nullable=False, index=True)
     month = db.Column(db.Integer, nullable=False, index=True)
-    main_income = db.Column(db.Integer, default=0, nullable=True)
     day = db.Column(db.Integer, nullable=False)
-    additional_income = db.Column(db.Integer, default=0, nullable=True)
+    main_income = db.Column(db.Integer, default=0)
+    additional_income = db.Column(db.Integer, default=0)
+    comment = db.Column(db.String(200), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
@@ -42,7 +43,7 @@ class Income(db.Model):
         return self.main_income + self.additional_income
 
     def __repr__(self):
-        return f'<Income {self.year}-{self.month:02d}: {self.total} ₽>'
+        return f'<Income {self.year}-{self.month:02d}-{self.day:02d}: {self.total} DKK>'
 
 
 class Expense(db.Model):

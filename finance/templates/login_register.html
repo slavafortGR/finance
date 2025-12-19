@@ -1,52 +1,131 @@
 {% extends "layout.html" %}
 
 {% block content %}
-{% if login_tab %}
-    <div class="content-wrapper">
-        <h2>Sing in</h2>
-        <form action="/login" method="POST">
-            <div class="mb-3">
-                {{ login_form.hidden_tag() }}
-                <label class="form-label"><strong>Nick:</strong></label>
-                {{ login_form.nick_name(class="form-control", required=True, autofocus=True) }}
-            </div>
-            <div class="mb-3">
-                <label class="form-label"><strong>Password:</strong></label>
-                {{ login_form.password(class="form-control", required=True) }}
-            </div>
-            <input type="submit" class="btn btn-success" value="Sing in">
-        </form>
-    </div>
-{% endif %}
+<div class="hero min-h-screen">
+    <div class="hero-content flex-col w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold">
+                <i class="bi bi-wallet2 text-primary"></i> Finance Tracker
+            </h1>
+            <p class="py-6">Manage your finances easily</p>
+        </div>
 
-{% if register_tab %}
-<div class="content-wrapper">
-    <h2>Sing up</h2>
-    <form action="/register" method="POST">
-        <div class="mb-3">
-            {{ registration_form.hidden_tag() }}
-            <label class="form-label"><strong>Nick:</strong></label>
-            {{ registration_form.nick_name(class="form-control", required=False, autofocus=True) }}
-            {% for error in registration_form.nick_name.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+        <div role="tablist" class="tabs tabs-boxed mb-4 w-full">
+            <a role="tab" class="tab {% if login_tab %}tab-active{% endif %}"
+               href="{{ url_for('login_user_get') }}">
+                <i class="bi bi-box-arrow-in-right"></i> Sign In
+            </a>
+            <a role="tab" class="tab {% if register_tab %}tab-active{% endif %}"
+               href="{{ url_for('register_user_get') }}">
+                <i class="bi bi-person-plus"></i> Sign Up
+            </a>
         </div>
-        <div class="mb-3">
-            <label class="form-label"><strong>Password:</strong></label>
-            {{ registration_form.password(class="form-control", required=True) }}
-            {% for error in registration_form.password.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+
+        {% if login_tab %}
+        <div class="card bg-base-100 w-full shadow-2xl">
+            <form method="POST" action="{{ url_for('login_user_post') }}" class="card-body">
+                {{ login_form.hidden_tag() }}
+
+                <h2 class="card-title text-2xl mb-4">Sign In</h2>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Nickname</span>
+                    </label>
+                    {{ login_form.nick_name(class="input input-bordered", required=True, autofocus=True, placeholder="Enter your nickname") }}
+                    {% for error in login_form.nick_name.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Password</span>
+                    </label>
+                    {{ login_form.password(class="input input-bordered", required=True, placeholder="Enter your password") }}
+                    {% for error in login_form.password.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="form-control mt-6">
+                    <button type="submit" class="btn btn-primary gap-2">
+                        <i class="bi bi-box-arrow-in-right"></i> Sign In
+                    </button>
+                </div>
+
+                <div class="divider">OR</div>
+
+                <p class="text-center">
+                    Don't have an account?
+                    <a href="{{ url_for('register_user_get') }}" class="link link-primary">Sign Up</a>
+                </p>
+            </form>
         </div>
-        <div class="mb-3">
-            <label class="form-label"><strong>Confirm password:</strong></label>
-            {{ registration_form.confirm_password(class="form-control", required=True) }}
-            {% for error in registration_form.confirm_password.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+        {% endif %}
+
+        {% if register_tab %}
+        <div class="card bg-base-100 w-full shadow-2xl">
+            <form method="POST" action="{{ url_for('register_user_post') }}" class="card-body">
+                {{ registration_form.hidden_tag() }}
+
+                <h2 class="card-title text-2xl mb-4">Sign Up</h2>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Nickname</span>
+                    </label>
+                    {{ registration_form.nick_name(class="input input-bordered", required=True, autofocus=True, placeholder="Choose a nickname") }}
+                    {% for error in registration_form.nick_name.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Password</span>
+                    </label>
+                    {{ registration_form.password(class="input input-bordered", required=True, placeholder="Create a password") }}
+                    {% for error in registration_form.password.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Confirm Password</span>
+                    </label>
+                    {{ registration_form.confirm_password(class="input input-bordered", required=True, placeholder="Confirm your password") }}
+                    {% for error in registration_form.confirm_password.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="form-control mt-6">
+                    <button type="submit" class="btn btn-primary gap-2">
+                        <i class="bi bi-person-plus"></i> Sign Up
+                    </button>
+                </div>
+
+                <div class="divider">OR</div>
+
+                <p class="text-center">
+                    Already have an account?
+                    <a href="{{ url_for('login_user_get') }}" class="link link-primary">Sign In</a>
+                </p>
+            </form>
         </div>
-        <input type="submit" class="btn btn-success" value="Sing up">
-    </form>
+        {% endif %}
+    </div>
 </div>
-{% endif %}
 {% endblock %}

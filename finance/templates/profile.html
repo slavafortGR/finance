@@ -78,6 +78,7 @@
                             <th>Main Income</th>
                             <th>Additional Income</th>
                             <th>Total</th>
+                            <th>Comment</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -88,6 +89,7 @@
                             <td>{{ "{:,}".format(income.main_income).replace(',', ' ') }} DKK</td>
                             <td>{{ "{:,}".format(income.additional_income).replace(',', ' ') }} DKK</td>
                             <td><strong>{{ "{:,}".format(income.total).replace(',', ' ') }} DKK</strong></td>
+                            <td>{{ income.comment or '-' }}</td>
                             <td>
                                 <div class="join">
                                     <a href="{{ url_for('edit_income_get', income_id=income.id) }}"

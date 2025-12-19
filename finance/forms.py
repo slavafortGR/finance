@@ -30,6 +30,7 @@ class IncomeForm(FlaskForm):
             NumberRange(min=0, message='Income cannot be negative')], default=0)
     additional_income = IntegerField('Additional income', validators=[Optional(),
             NumberRange(min=0, message='Income cannot be negative')], default=0)
+    comment = TextAreaField("Comment",validators=[Optional(), Length(max=255)])
     submit = SubmitField('Save')
 
 

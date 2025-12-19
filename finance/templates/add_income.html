@@ -12,6 +12,7 @@
             <form action="/income" method="POST" class="space-y-4">
                 {{ income_form.hidden_tag() }}
 
+                <!-- Date -->
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text font-semibold">Date</span>
@@ -27,6 +28,7 @@
                     {% endfor %}
                 </div>
 
+                <!-- Main Income -->
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text font-semibold">Main Income</span>
@@ -45,6 +47,7 @@
                     {% endfor %}
                 </div>
 
+                <!-- Additional Income -->
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text font-semibold">Additional Income</span>
@@ -63,11 +66,26 @@
                     {% endfor %}
                 </div>
 
+                <!-- Comment -->
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Comment (optional)</span>
+                    </label>
+                    {{ income_form.comment(class="textarea textarea-bordered w-full", rows="3", placeholder="e.g., Salary for December, Freelance project...") }}
+                    {% for error in income_form.comment.errors %}
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ error }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Info Alert -->
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle"></i>
                     <span>At least one income field must be greater than 0</span>
                 </div>
 
+                <!-- Buttons -->
                 <div class="card-actions justify-end gap-2">
                     <button type="submit" class="btn btn-success gap-2">
                         <i class="bi bi-save"></i> Save
