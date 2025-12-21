@@ -1,0 +1,213 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-4xl font-bold">📊 Statistics</h1>
+    <p class="text-base-content/70">Visual overview of your finances</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="stat bg-success text-success-content rounded-lg shadow-lg">
+        <div class="stat-title text-success-content/70">Total Income</div>
+        <div class="stat-value">{{ "{:,}".format(total_income_all).replace(',', ' ') }}</div>
+        <div class="stat-desc text-success-content/70">DKK</div>
+    </div>
+    
+    <div class="stat bg-error text-error-content rounded-lg shadow-lg">
+        <div class="stat-title text-error-content/70">Total Expenses</div>
+        <div class="stat-value">{{ "{:,}".format(total_expenses_all).replace(',', ' ') }}</div>
+        <div class="stat-desc text-error-content/70">DKK</div>
+    </div>
+    
+    <div class="stat {% if balance_all >= 0 %}bg-primary text-primary-content{% else %}bg-warning text-warning-content{% endif %} rounded-lg shadow-lg">
+        <div class="stat-title {% if balance_all >= 0 %}text-primary-content/70{% else %}text-warning-content/70{% endif %}">Total Balance</div>
+        <div class="stat-value">{{ "{:,}".format(balance_all).replace(',', ' ') }}</div>
+        <div class="stat-desc {% if balance_all >= 0 %}text-primary-content/70{% else %}text-warning-content/70{% endif %}">DKK</div>
+    </div>
+</div>
+
+<div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+            <i class="bi bi-graph-up"></i> Income vs Expenses (Last 6 Months)
+        </h2>
+        <canvas id="incomeExpensesChart" height="100"></canvas>
+    </div>
+</div>
+
+<div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+            <i class="bi bi-graph-up-arrow"></i> Balance Trend
+        </h2>
+        <canvas id="balanceChart" height="100"></canvas>
+    </div>
+</div>
+
+<div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+            <i class="bi bi-pie-chart"></i> Top 5 Expense Categories (Last 3 Months)
+        </h2>
+        <div class="flex justify-center">
+            <div style="max-width: 400px; max-height: 400px;">
+                <canvas id="categoriesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">All Categories (Last 3 Months)</h2>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Total Spent</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set total = all_categories|sum(attribute='total') %}
+                    {% for cat in all_categories %}
+                    <tr>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <span class="text-2xl">{{ cat.icon }}</span>
+                                <span>{{ cat.display_name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-error badge-lg">
+                                {{ "{:,}".format(cat.total).replace(',', ' ') }} DKK
+                            </span>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-2">
+                                <progress class="progress progress-error w-32" 
+                                          value="{{ (cat.total / total * 100) if total > 0 else 0 }}" 
+                                          max="100"></progress>
+                                <span>{{ "%.1f"|format((cat.total / total * 100) if total > 0 else 0) }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+const monthsData = {{ months_data|tojson }};
+const topCategories = {{ top_categories|tojson }};
+
+const ctx1 = document.getElementById('incomeExpensesChart').getContext('2d');
+new Chart(ctx1, {
+    type: 'bar',
+    data: {
+        labels: monthsData.map(m => m.month_name),
+        datasets: [
+            {
+                label: 'Income',
+                data: monthsData.map(m => m.income),
+                backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                borderColor: 'rgba(34, 197, 94, 1)',
+                borderWidth: 2
+            },
+            {
+                label: 'Expenses',
+                data: monthsData.map(m => m.expenses),
+                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                borderColor: 'rgba(239, 68, 68, 1)',
+                borderWidth: 2
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return value.toLocaleString() + ' DKK';
+                    }
+                }
+            }
+        }
+    }
+});
+
+const ctx2 = document.getElementById('balanceChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'line',
+    data: {
+        labels: monthsData.map(m => m.month_name),
+        datasets: [{
+            label: 'Balance',
+            data: monthsData.map(m => m.balance),
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            y: {
+                ticks: {
+                    callback: function(value) {
+                        return value.toLocaleString() + ' DKK';
+                    }
+                }
+            }
+        }
+    }
+});
+
+const ctx3 = document.getElementById('categoriesChart').getContext('2d');
+new Chart(ctx3, {
+    type: 'doughnut',
+    data: {
+        labels: topCategories.map(c => c.icon + ' ' + c.display_name),
+        datasets: [{
+            data: topCategories.map(c => c.total),
+            backgroundColor: [
+                'rgba(239, 68, 68, 0.8)',
+                'rgba(249, 115, 22, 0.8)',
+                'rgba(245, 158, 11, 0.8)',
+                'rgba(34, 197, 94, 0.8)',
+                'rgba(59, 130, 246, 0.8)'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ' + context.parsed.toLocaleString() + ' DKK';
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

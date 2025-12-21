@@ -1,15 +1,18 @@
 import functools
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from itertools import groupby
+import json
 
 from flask import render_template, redirect, request,url_for, flash, session
 from sqlalchemy.sql.functions import current_user
+from sqlalchemy import func, extract
 
 from finance import app, db
 from finance.forms import LoginForm, RegistrationForm, IncomeForm, ExpenseForm
 from finance.logger import logger
-from finance.models import User, Income, Expense
+from finance.models import User, Income, Expense, Category
 from werkzeug.security import check_password_hash, generate_password_hash
+
 
 
 def log_exceptions(func):
@@ -524,3 +527,85 @@ def delete_expense(expense_id):
         flash(f'An error occurred: {str(e)}', 'danger')
 
     return redirect(url_for('list_expenses'))
+
+
+@app.route('/statistics', methods=['GET'])
+@log_exceptions
+def statistics():
+    if 'user_id' not in session:
+        flash('You need login', 'danger')
+        return redirect(url_for('login_user_get'))
+
+    user_id = session['user_id']
+
+    current_date = date.today()
+    months_data = []
+
+    for i in range(5, -1, -1):
+        target_date = current_date.replace(day=1) - timedelta(days=30 * i)
+        year = target_date.year
+        month = target_date.month
+
+        incomes = Income.query.filter_by(
+            user_id=user_id,
+            year=year,
+            month=month
+        ).all()
+
+        total_income = sum(inc.total for inc in incomes)
+
+        expenses = Expense.query.filter(
+            Expense.user_id == user_id,
+            extract('year', Expense.date) == year,
+            extract('month', Expense.date) == month
+        ).all()
+
+        total_expenses = sum(exp.amount for exp in expenses)
+
+        months_data.append({
+            'month': f"{year}-{month:02d}",
+            'month_name': target_date.strftime('%B %Y'),
+            'income': total_income,
+            'expenses': total_expenses,
+            'balance': total_income - total_expenses
+        })
+
+    three_months_ago = current_date - timedelta(days=90)
+
+    expenses_by_category = db.session.query(
+        Category.display_name,
+        Category.icon,
+        func.sum(Expense.amount).label('total')
+    ).join(Expense).filter(
+        Expense.user_id == user_id,
+        Expense.date >= three_months_ago
+    ).group_by(Category.display_name, Category.icon).order_by(
+        func.sum(Expense.amount).desc()
+    ).all()
+
+    all_categories = [
+        {
+            'display_name': row[0],
+            'icon': row[1],
+            'total': row[2]
+        }
+        for row in expenses_by_category
+    ]
+
+    top_categories = all_categories[:5]
+
+    total_income_all = db.session.query(func.sum(Income.main_income + Income.additional_income)).filter(
+        Income.user_id == user_id
+    ).scalar() or 0
+
+    total_expenses_all = db.session.query(func.sum(Expense.amount)).filter(
+        Expense.user_id == user_id
+    ).scalar() or 0
+
+    return render_template('statistics.html',
+                           months_data=months_data,
+                           top_categories=top_categories,
+                           all_categories=all_categories,
+                           total_income_all=total_income_all,
+                           total_expenses_all=total_expenses_all,
+                           balance_all=total_income_all - total_expenses_all)

@@ -41,6 +41,9 @@
             <li><a href="{{ url_for('return_profile') }}" class="{% if request.endpoint == 'return_profile' %}active{% endif %}">
                 <i class="bi bi-house-door"></i> Profile
             </a></li>
+            <li><a href="{{ url_for('statistics') }}" class="{% if request.endpoint == 'statistics' %}active{% endif %}">
+                <i class="bi bi-graph-up"></i> Statistics
+            </a></li>
             <li><a href="{{ url_for('add_income_get') }}" class="{% if request.endpoint == 'add_income_get' %}active{% endif %}">
                 <i class="bi bi-plus-circle"></i> Add Income
             </a></li>
